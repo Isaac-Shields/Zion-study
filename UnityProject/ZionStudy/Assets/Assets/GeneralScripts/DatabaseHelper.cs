@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.IO;
 using Mono.Data.Sqlite;
-using UnityEditor.MemoryProfiler;
 using UnityEngine;
 
 public class DatabaseHelper : MonoBehaviour
@@ -38,13 +37,13 @@ public class DatabaseHelper : MonoBehaviour
 
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = $@"CREATE TABLE IF NOT EXISTS {usersTable} (userId INTEGER PRIMARY KEY AUTOINCREMENT, username VARCHAR(25) NOT NULL, password VARCHAR(20), isAdmin BOOLEAN);";
+                command.CommandText = $@"CREATE TABLE IF NOT EXISTS {usersTable} (userId INTEGER PRIMARY KEY AUTOINCREMENT, username VARCHAR(25) NOT NULL, password VARCHAR(20), isAdmin INTEGER);";
                 command.ExecuteNonQuery();
 
                 command.CommandText = $"CREATE TABLE IF NOT EXISTS {notesTable} (title VARCHAR(50), body VARCHAR(720), userId INTEGER, FOREIGN KEY (userId) REFERENCES {usersTable}(userId));";
                 command.ExecuteNonQuery();
 
-                command.CommandText = $"CREATE TABLE IF NOT EXISTS {cardsTable} (setId INTEGER PRIMARY KEY AUTOINCREMENT, title VARCHAR(20), isPublic BOOLEAN, commentsId INTEGER, userId INTEGER, FOREIGN KEY (userId) REFERENCES {usersTable}(userId));";
+                command.CommandText = $"CREATE TABLE IF NOT EXISTS {cardsTable} (setId INTEGER PRIMARY KEY AUTOINCREMENT, title VARCHAR(20), isPublic INTEGER, commentsId INTEGER, userId INTEGER, FOREIGN KEY (userId) REFERENCES {usersTable}(userId));";
                 command.ExecuteNonQuery();
 
                 command.CommandText = $"CREATE TABLE IF NOT EXISTS {problemsTable} (problem VARCHAR(30), answer VARCHAR(30), setId INTEGER, FOREIGN KEY (setId) REFERENCES {cardsTable}(setId));";
@@ -59,24 +58,80 @@ public class DatabaseHelper : MonoBehaviour
     }
 
 
-    public bool checkUsername(string username)
+    public bool newUserName(string username)
     {
-        bool validUsername = false;
+        bool validUsername = true;
         string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
         using (SqliteConnection connection = new SqliteConnection(connectionString))
         {
             connection.Open();
-            string query = $"SELECT count(*) FROM {usersTable} WHERE username = @username";
 
-            using (SqliteCommand command = new SqliteCommand(query, connection))
+            using (SqliteCommand command = new SqliteCommand(connection))
             {
-                command.Parameters.AddWithValue("@username", username);
-
-                validUsername = Convert.ToInt32(command.ExecuteScalar()) > 0;
+                command.CommandText = $"SELECT count(*) FROM {usersTable} WHERE username = '{username}'";
+                int count = Convert.ToInt32(command.ExecuteScalar());
+                if(count > 0)
+                {
+                    validUsername = false;
+                }
             }
         }
 
         return validUsername;
+    }
+
+    public bool addNewUser(string usernameFS, string password)
+    {
+        bool userAdded = false;
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"INSERT INTO {usersTable} (username, password, isAdmin) VALUES ('{usernameFS}', '{password}', 'FALSE');";
+                    cmd.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+
+            userAdded = true;
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Error inserting user: " + ex.Message);
+        }
+
+        return userAdded;
+    }
+
+    public bool validCredentials(string usernameSent, string passwordSent)
+    {
+        bool validLoginDetails = false;
+        string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+        using (SqliteConnection connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+
+            using(SqliteCommand cmd = new SqliteCommand(connection))
+            {
+                cmd.CommandText = $"SELECT COUNT(*) FROM {usersTable} WHERE username = '{usernameSent}' AND password = '{passwordSent}';";
+
+                int count = Convert.ToInt32(cmd.ExecuteScalar());
+                if(count > 0)
+                {
+                    validLoginDetails = true;
+                }
+
+            }
+        }
+
+        return validLoginDetails;
+
     }
 
 
