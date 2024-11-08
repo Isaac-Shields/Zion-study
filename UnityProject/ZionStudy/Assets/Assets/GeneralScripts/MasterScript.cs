@@ -15,12 +15,13 @@ public class MasterScript : MonoBehaviour
     public GameObject createCardsCanvas;
     public GameObject createNotesCanvas;
     public GameObject signupCanvas;
-
-
+    public UserSessionData curSessionData;
+    public GameObject noteRud;
     private void Start() 
     {
         cleanUpBeforeSwitch();
         startLoginCanvas();
+        curSessionData = new UserSessionData();
     }
 
 
@@ -31,6 +32,11 @@ public class MasterScript : MonoBehaviour
         signupCanvas.GetComponent<SignupScriptMaster>().signupCanvasCleanup();
     }
 
+
+    public void startNoteRUDCanvas()
+    {
+        noteRud.SetActive(true);
+    }
 
     public void startSettingsCanvas()
     {
@@ -53,6 +59,7 @@ public class MasterScript : MonoBehaviour
     {
         cleanUpBeforeSwitch();
         notesCanvas.SetActive(true);
+        notesCanvas.GetComponent<NotesListview>().fillListView();
     }
 
     public void startCardsCanvas()
@@ -72,6 +79,7 @@ public class MasterScript : MonoBehaviour
     public void startAddNotesCanvas()
     {   
         cleanUpBeforeSwitch();
+        closeNavBarCanvas();
         createNotesCanvas.SetActive(true);
     }
 
@@ -91,6 +99,12 @@ public class MasterScript : MonoBehaviour
         navBarCanvas.SetActive(false);
     }
 
+
+    public void closeNoteRudCanvas()
+    {
+        noteRud.SetActive(false);
+    }
+
     public void closeCardsCanvas()
     {
 
@@ -103,7 +117,13 @@ public class MasterScript : MonoBehaviour
 
     public void closeNotesCanvas()
     {
+        notesCanvas.SetActive(false);
+    }
 
+    public void closeAddNoteCanvas()
+    {
+        createNotesCanvas.GetComponent<NotesAddNote>().clearCanvas();
+        createNotesCanvas.SetActive(false);
     }
 
     public void closeAddCardsCanvas()
@@ -126,6 +146,8 @@ public class MasterScript : MonoBehaviour
         createCardsCanvas.SetActive(false);
         createNotesCanvas.SetActive(false);
         settingsCanvas.SetActive(false);
+        noteRud.SetActive(false);
+        
 
     }
 

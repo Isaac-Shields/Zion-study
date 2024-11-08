@@ -35,8 +35,12 @@ public class LoginMasterScript : MonoBehaviour
         {
             if(!masterObj.GetComponent<DatabaseHelper>().newUserName(loginUsername.text))
             {
-                if(masterObj.GetComponent<DatabaseHelper>().validCredentials(loginUsername.text, loginPassword.text))
+                int uid = masterObj.GetComponent<DatabaseHelper>().getSessionData(loginUsername.text, loginPassword.text);
+                if(uid != -1)
                 {
+                    master.curSessionData.setUsername(loginUsername.text);
+                    master.curSessionData.setUserPassword(loginPassword.text);
+                    master.curSessionData.setUserId(uid);
                     master.cleanUpBeforeSwitch();
                     master.startCalculatorCanvas();
                     master.startNavBarCanvas();

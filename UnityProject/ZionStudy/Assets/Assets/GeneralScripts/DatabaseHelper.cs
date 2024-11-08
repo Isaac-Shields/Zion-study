@@ -40,7 +40,7 @@ public class DatabaseHelper : MonoBehaviour
                 command.CommandText = $@"CREATE TABLE IF NOT EXISTS {usersTable} (userId INTEGER PRIMARY KEY AUTOINCREMENT, username VARCHAR(25) NOT NULL, password VARCHAR(20), isAdmin INTEGER);";
                 command.ExecuteNonQuery();
 
-                command.CommandText = $"CREATE TABLE IF NOT EXISTS {notesTable} (title VARCHAR(50), body VARCHAR(720), userId INTEGER, FOREIGN KEY (userId) REFERENCES {usersTable}(userId));";
+                command.CommandText = $"CREATE TABLE IF NOT EXISTS {notesTable} (title VARCHAR(128), body VARCHAR(512), userId INTEGER, FOREIGN KEY (userId) REFERENCES {usersTable}(userId));";
                 command.ExecuteNonQuery();
 
                 command.CommandText = $"CREATE TABLE IF NOT EXISTS {cardsTable} (setId INTEGER PRIMARY KEY AUTOINCREMENT, title VARCHAR(20), isPublic INTEGER, commentsId INTEGER, userId INTEGER, FOREIGN KEY (userId) REFERENCES {usersTable}(userId));";
@@ -109,6 +109,33 @@ public class DatabaseHelper : MonoBehaviour
         return userAdded;
     }
 
+
+        public int getSessionData(string username, string password)
+        {
+            int userId = -1;
+            if(validCredentials(username, password))
+            {
+                string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+                using (SqliteConnection connection = new SqliteConnection(connectionString))
+                {
+                    connection.Open();
+
+                    using(SqliteCommand cmd = new SqliteCommand(connection))
+                    {
+                        cmd.CommandText = $"SELECT userId FROM {usersTable} WHERE username = '{username}' AND password = '{password}';";
+
+                        using(SqliteDataReader reader = cmd.ExecuteReader())
+                        {
+                            userId = Int32.Parse(reader["userId"].ToString());
+                        }
+
+                    }
+                }
+            }
+
+            return userId;
+        }
+
     public bool validCredentials(string usernameSent, string passwordSent)
     {
         bool validLoginDetails = false;
@@ -133,6 +160,70 @@ public class DatabaseHelper : MonoBehaviour
         return validLoginDetails;
 
     }
+    public bool addNoteToDatabase(string title, string body, int userId)
+    {
+        bool validOperation = false;
 
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
 
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"INSERT INTO {notesTable} (title, body, userId) VALUES ('{title}', '{body}', '{userId}');";
+                    cmd.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+
+            validOperation = true;
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Error: " + " Line 186, " + ex.Message);
+        }
+
+        return validOperation;
+    }
+
+    public List<notesObj> getAllNotesFromDatabase(int uid)
+    {
+        List<notesObj> notes = new List<notesObj>();
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                    connection.Open();
+
+                    using(SqliteCommand cmd = new SqliteCommand(connection))
+                    {
+                        cmd.CommandText = $"SELECT * FROM {notesTable} WHERE userId = '{uid}' ;";
+
+                        using(SqliteDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                notesObj curnote = new notesObj();
+                                curnote.setNoteTitle(reader["title"].ToString());
+                                curnote.setNoteBody(reader["body"].ToString());
+                                curnote.setNoteId(uid);
+                                notes.Add(curnote);
+                            }
+                        }
+
+                    }
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Error: " + " Line 186, " + ex.Message);
+        }
+
+        return notes;
+    }
 }
