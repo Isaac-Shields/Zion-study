@@ -2,7 +2,6 @@ public class notesObj
 {
     private string title;
     private string body;
-
     private int noteId;
 
     public notesObj()

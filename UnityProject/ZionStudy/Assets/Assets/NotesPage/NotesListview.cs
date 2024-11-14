@@ -32,7 +32,7 @@ public class NotesListview : MonoBehaviour
         {
             GameObject listItem = Instantiate(notesTemplate, content);
             Button link = listItem.GetComponent<Button>();
-            link.onClick.AddListener(() => noterudScript.fillNote(noteobj.getTitle(), noteobj.getBody()));
+            link.onClick.AddListener(() => noterudScript.fillNote(noteobj.getTitle(), noteobj.getBody(), noteobj.getNoteId()));
             link.GetComponentInChildren<TextMeshProUGUI>().text = noteobj.getTitle();
         }
     }

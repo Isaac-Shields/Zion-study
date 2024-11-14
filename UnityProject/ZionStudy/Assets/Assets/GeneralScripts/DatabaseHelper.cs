@@ -40,7 +40,7 @@ public class DatabaseHelper : MonoBehaviour
                 command.CommandText = $@"CREATE TABLE IF NOT EXISTS {usersTable} (userId INTEGER PRIMARY KEY AUTOINCREMENT, username VARCHAR(25) NOT NULL, password VARCHAR(20), isAdmin INTEGER);";
                 command.ExecuteNonQuery();
 
-                command.CommandText = $"CREATE TABLE IF NOT EXISTS {notesTable} (title VARCHAR(128), body VARCHAR(512), userId INTEGER, FOREIGN KEY (userId) REFERENCES {usersTable}(userId));";
+                command.CommandText = $"CREATE TABLE IF NOT EXISTS {notesTable} (noteId INTEGER PRIMARY KEY AUTOINCREMENT, title VARCHAR(128), body VARCHAR(512), userId INTEGER, FOREIGN KEY (userId) REFERENCES {usersTable}(userId));";
                 command.ExecuteNonQuery();
 
                 command.CommandText = $"CREATE TABLE IF NOT EXISTS {cardsTable} (setId INTEGER PRIMARY KEY AUTOINCREMENT, title VARCHAR(20), isPublic INTEGER, commentsId INTEGER, userId INTEGER, FOREIGN KEY (userId) REFERENCES {usersTable}(userId));";
@@ -210,7 +210,7 @@ public class DatabaseHelper : MonoBehaviour
                                 notesObj curnote = new notesObj();
                                 curnote.setNoteTitle(reader["title"].ToString());
                                 curnote.setNoteBody(reader["body"].ToString());
-                                curnote.setNoteId(uid);
+                                curnote.setNoteId(Convert.ToInt32(reader["noteId"].ToString()));
                                 notes.Add(curnote);
                             }
                         }
@@ -225,5 +225,61 @@ public class DatabaseHelper : MonoBehaviour
         }
 
         return notes;
+    }
+
+
+    public bool updateNotes(string t, string b, int nid)
+    {
+        bool success = false;
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"UPDATE {notesTable} SET title = '{t}', body = '{b}' where noteId = {nid};";
+                    cmd.ExecuteNonQuery();
+                    success = true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Error updating note on line 241: " + ex.Message);
+        }
+
+        return success;
+    }
+
+    public bool deleteNote(int nid)
+    {
+        bool success = false;
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"DELETE FROM {notesTable} WHERE noteId = '{nid}';";
+                    cmd.ExecuteNonQuery();
+                    success = true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Error updating note on line 241: " + ex.Message);
+        }
+
+        return success;
     }
 }

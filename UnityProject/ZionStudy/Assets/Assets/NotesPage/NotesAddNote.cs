@@ -23,6 +23,8 @@ public class NotesAddNote : MonoBehaviour
     private void goBack()
     {
         master.closeAddNoteCanvas();
+        master.startAddNotesCanvas();
+        master.startNavBarCanvas();
     }
 
     public void clearCanvas()
@@ -42,6 +44,7 @@ public class NotesAddNote : MonoBehaviour
             {
                 errorMsg.text = "Note saved.";
                 errorMsg.color = Color.green;
+                goBack();
             }
             else
             {
