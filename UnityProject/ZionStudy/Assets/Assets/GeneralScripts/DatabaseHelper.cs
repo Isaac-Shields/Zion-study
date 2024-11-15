@@ -23,6 +23,7 @@ public class DatabaseHelper : MonoBehaviour
     }
 
 
+    //Create the database
     private void CreateDB()
     {
         if(!File.Exists(dbPath))
@@ -58,6 +59,7 @@ public class DatabaseHelper : MonoBehaviour
     }
 
 
+    //Checks if the username entered is valid (unique)
     public bool newUserName(string username)
     {
         bool validUsername = true;
@@ -75,11 +77,14 @@ public class DatabaseHelper : MonoBehaviour
                     validUsername = false;
                 }
             }
+
+            connection.Close();
         }
 
         return validUsername;
     }
 
+    //Adds a new user to the database
     public bool addNewUser(string usernameFS, string password)
     {
         bool userAdded = false;
@@ -109,33 +114,32 @@ public class DatabaseHelper : MonoBehaviour
         return userAdded;
     }
 
-
-        public int getSessionData(string username, string password)
+    //Get userId
+    public int getSessionData(string username, string password)
+    {
+        int userId = -1;
+        if(validCredentials(username, password))
         {
-            int userId = -1;
-            if(validCredentials(username, password))
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
             {
-                string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
-                using (SqliteConnection connection = new SqliteConnection(connectionString))
+                connection.Open();
+                using(SqliteCommand cmd = new SqliteCommand(connection))
                 {
-                    connection.Open();
-
-                    using(SqliteCommand cmd = new SqliteCommand(connection))
+                    cmd.CommandText = $"SELECT userId FROM {usersTable} WHERE username = '{username}' AND password = '{password}';";
+                    using(SqliteDataReader reader = cmd.ExecuteReader())
                     {
-                        cmd.CommandText = $"SELECT userId FROM {usersTable} WHERE username = '{username}' AND password = '{password}';";
-
-                        using(SqliteDataReader reader = cmd.ExecuteReader())
-                        {
-                            userId = Int32.Parse(reader["userId"].ToString());
-                        }
-
+                        userId = Int32.Parse(reader["userId"].ToString());
                     }
                 }
+
+                connection.Close();
             }
-
-            return userId;
         }
+        return userId;
+    }
 
+    //Checks if the username and password are correct
     public bool validCredentials(string usernameSent, string passwordSent)
     {
         bool validLoginDetails = false;
@@ -153,13 +157,16 @@ public class DatabaseHelper : MonoBehaviour
                 {
                     validLoginDetails = true;
                 }
-
             }
+
+            connection.Close();
         }
 
         return validLoginDetails;
 
     }
+
+    //Adds a note to the database
     public bool addNoteToDatabase(string title, string body, int userId)
     {
         bool validOperation = false;
@@ -189,6 +196,7 @@ public class DatabaseHelper : MonoBehaviour
         return validOperation;
     }
 
+    //Returns a list of all the notes belonging to a user
     public List<notesObj> getAllNotesFromDatabase(int uid)
     {
         List<notesObj> notes = new List<notesObj>();
@@ -213,9 +221,14 @@ public class DatabaseHelper : MonoBehaviour
                                 curnote.setNoteId(Convert.ToInt32(reader["noteId"].ToString()));
                                 notes.Add(curnote);
                             }
+
+                            reader.Close();
                         }
 
+
                     }
+
+                    connection.Close();
             }
 
         }
@@ -228,6 +241,7 @@ public class DatabaseHelper : MonoBehaviour
     }
 
 
+    //Updates an existing note
     public bool updateNotes(string t, string b, int nid)
     {
         bool success = false;
@@ -246,6 +260,8 @@ public class DatabaseHelper : MonoBehaviour
                     cmd.ExecuteNonQuery();
                     success = true;
                 }
+
+                connection.Close();
             }
         }
         catch (Exception ex)
@@ -256,6 +272,7 @@ public class DatabaseHelper : MonoBehaviour
         return success;
     }
 
+    //Deletes a not from the database
     public bool deleteNote(int nid)
     {
         bool success = false;
@@ -273,6 +290,8 @@ public class DatabaseHelper : MonoBehaviour
                     cmd.ExecuteNonQuery();
                     success = true;
                 }
+
+                connection.Close();
             }
         }
         catch (Exception ex)

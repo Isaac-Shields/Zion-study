@@ -8,6 +8,7 @@ public class CardsMasterScript : MonoBehaviour
     public Button createNewCardSet;
     public Button goBackFromCreateCardBtn;
     public MasterScript master;
+    public GameObject cardsetNameCanvas;
 
     void Start()
     {
@@ -17,9 +18,8 @@ public class CardsMasterScript : MonoBehaviour
 
     private void openCreateCardsCanvas()
     {
-        master.startAddCardCanvas();
         master.closeNavBarCanvas();
-
+        cardsetNameCanvas.SetActive(true);
     }
 
     private void goBack()

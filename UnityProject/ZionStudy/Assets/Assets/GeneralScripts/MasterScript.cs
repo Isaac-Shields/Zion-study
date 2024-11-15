@@ -17,11 +17,13 @@ public class MasterScript : MonoBehaviour
     public GameObject signupCanvas;
     public UserSessionData curSessionData;
     public GameObject noteRud;
+    public cardsetObj curCard;
     private void Start() 
     {
         cleanUpBeforeSwitch();
         startLoginCanvas();
         curSessionData = new UserSessionData();
+        curCard = new cardsetObj();
     }
 
 

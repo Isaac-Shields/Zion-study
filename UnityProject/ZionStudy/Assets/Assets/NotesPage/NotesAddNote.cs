@@ -23,7 +23,7 @@ public class NotesAddNote : MonoBehaviour
     private void goBack()
     {
         master.closeAddNoteCanvas();
-        master.startAddNotesCanvas();
+        master.startNotesCanvas();
         master.startNavBarCanvas();
     }
 
