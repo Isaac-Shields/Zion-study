@@ -15,6 +15,7 @@ public class DatabaseHelper : MonoBehaviour
     private static string cardsTable = "cards";
     private static string problemsTable = "problems";
     private static string commentsTable = "comments";
+    public MasterScript master;
 
     void Start ()
     {
@@ -240,7 +241,6 @@ public class DatabaseHelper : MonoBehaviour
         return notes;
     }
 
-
     //Updates an existing note
     public bool updateNotes(string t, string b, int nid)
     {
@@ -300,5 +300,222 @@ public class DatabaseHelper : MonoBehaviour
         }
 
         return success;
+    }
+
+    public bool createCardset(string title, int uid)
+    {
+        bool status = false;
+        //create a cardset
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"INSERT INTO {cardsTable} (title, userId, isPublic) VALUES ('{title}', '{uid}', '0');";
+                    cmd.ExecuteNonQuery();
+                }
+                connection.Close();
+                status = true;
+                int temp = getCardsetId(title);
+            }
+        }
+        catch(Exception ex)
+        {
+            Debug.Log("Error adding card: " + ex.Message);
+        }
+
+        return status;
+    }
+
+    public bool addCardToCardset(string problem, string answer, int cid)
+    {
+        bool status = false;
+        //add a card to the cardset
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"INSERT INTO {problemsTable} (problem, answer, setId) VALUES ('{problem}', '{answer}', '{cid}');";
+                    cmd.ExecuteNonQuery();
+                }
+                connection.Close();
+                status = true;
+            }
+        }
+        catch(Exception ex)
+        {
+            Debug.Log("Error adding card: " + ex.Message);
+        }
+
+        return status;
+    }
+
+    public int getCardsetId(string title)
+    {
+        int setId = -1;
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"SELECT * FROM {cardsTable} WHERE title = '{title}' ;";
+                    using(SqliteDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            setId = Int32.Parse(reader["setId"].ToString());
+                        }
+
+                        reader.Close();
+                    }
+                }
+                connection.Close();
+            }
+        }
+        catch(Exception ex)
+        {
+            Debug.Log("Error adding card: " + ex.Message);
+        }
+
+        if(setId != -1)
+        {
+            master.curCard.setId(setId);
+        }
+        else
+        {
+            Debug.Log("Error reading set ID");
+        }
+
+        return setId;
+    }
+
+    public List<string> getPrivateCardsets(int uid)
+    {
+        List<string> allTitles = new List<string>();
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"SELECT * FROM {cardsTable} WHERE userId = '{uid}';";
+
+                        using(SqliteDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                allTitles.Add(reader["title"].ToString());
+                            }
+
+                            reader.Close();
+                        }
+                }
+
+                connection.Close();
+            }
+        }
+        catch(Exception ex)
+        {
+            Debug.Log("Error getting cardsets: " + ex.Message);
+        }
+
+        return allTitles;
+    }
+
+    public List<string> getPublicCardsets()
+    {
+        List<string> allTitles = new List<string>();
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"SELECT * FROM {cardsTable} WHERE isPublic = '1';";
+
+                        using(SqliteDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                allTitles.Add(reader["title"].ToString());
+                            }
+
+                            reader.Close();
+                        }
+                }
+
+                connection.Close();
+            }
+        }
+        catch(Exception ex)
+        {
+            Debug.Log("Error getting cardsets: " + ex.Message);
+        }
+
+        return allTitles;
+    }
+
+    public List<problemObj> getAllProblems(string title)
+    {
+        List<problemObj> allProblems = new List<problemObj>();
+
+        try
+        {
+            int setId = getCardsetId(title);
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"SELECT * FROM {problemsTable} WHERE setId = '{setId}' ;";
+
+                    using(SqliteDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            problemObj problem = new problemObj();
+
+                            problem.setProblem(reader["problem"].ToString());
+                            problem.setAnswer(reader["answer"].ToString());
+
+                            allProblems.Add(problem);
+                        }
+
+                        reader.Close();
+                    }
+                }
+
+                connection.Close();
+            }
+        }
+        catch(Exception ex)
+        {
+            Debug.Log("Error getting problems: " + ex.Message);
+        }
+
+        return allProblems;
     }
 }

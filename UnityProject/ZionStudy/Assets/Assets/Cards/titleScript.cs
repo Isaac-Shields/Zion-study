@@ -27,10 +27,10 @@ public class titleScript : MonoBehaviour
 
     private void startAddCard()
     {
+        master.curCard.setCardsetTitle(title.text);
         this.gameObject.SetActive(false);
         master.startNavBarCanvas();
         master.startAddCardCanvas();
-        master.curCard.setCardsetTitle(title.text);
         title.text = "";
     }
 }

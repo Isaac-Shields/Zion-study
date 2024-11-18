@@ -18,6 +18,7 @@ public class MasterScript : MonoBehaviour
     public UserSessionData curSessionData;
     public GameObject noteRud;
     public cardsetObj curCard;
+    public GameObject practiceCardsCanvas;
     private void Start() 
     {
         cleanUpBeforeSwitch();
@@ -26,6 +27,18 @@ public class MasterScript : MonoBehaviour
         curCard = new cardsetObj();
     }
 
+
+    public void startPracticeCardsCanvas()
+    {
+        cleanUpBeforeSwitch();
+        practiceCardsCanvas.SetActive(true);
+    }
+
+    public void closePracticeCardsCanvas()
+    {
+        cleanUpBeforeSwitch();
+        practiceCardsCanvas.SetActive(false);
+    }
 
     public void closeSignupCanvas()
     {
@@ -89,6 +102,7 @@ public class MasterScript : MonoBehaviour
     {
         cleanUpBeforeSwitch();
         createCardsCanvas.SetActive(true);
+        createCardsCanvas.GetComponent<CreateNewCardScript>().title.text = curCard.getCardsetTitle();
     }
 
     public void closeCalculatorCanvas()
@@ -109,7 +123,7 @@ public class MasterScript : MonoBehaviour
 
     public void closeCardsCanvas()
     {
-
+        cardsCanvas.SetActive(false);
     }
 
     public void closeLoginCanvas()

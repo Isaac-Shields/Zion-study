@@ -6,7 +6,7 @@ using UnityEngine;
 public class cardsetObj
 {
     private string cardsetTitle;
-    private int cardsetId;
+    private int cardsetId = -1;
 
     public cardsetObj()
     {
