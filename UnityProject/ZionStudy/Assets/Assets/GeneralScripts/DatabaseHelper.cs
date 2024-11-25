@@ -15,6 +15,7 @@ public class DatabaseHelper : MonoBehaviour
     private static string cardsTable = "cards";
     private static string problemsTable = "problems";
     private static string commentsTable = "comments";
+    public static string calculatorTable = "calculators";
     public MasterScript master;
 
     void Start ()
@@ -48,11 +49,15 @@ public class DatabaseHelper : MonoBehaviour
                 command.CommandText = $"CREATE TABLE IF NOT EXISTS {cardsTable} (setId INTEGER PRIMARY KEY AUTOINCREMENT, title VARCHAR(20), isPublic INTEGER, commentsId INTEGER, userId INTEGER, FOREIGN KEY (userId) REFERENCES {usersTable}(userId));";
                 command.ExecuteNonQuery();
 
-                command.CommandText = $"CREATE TABLE IF NOT EXISTS {problemsTable} (problem VARCHAR(30), answer VARCHAR(30), setId INTEGER, FOREIGN KEY (setId) REFERENCES {cardsTable}(setId));";
+                command.CommandText = $"CREATE TABLE IF NOT EXISTS {problemsTable} (problemId INTEGER PRIMARY KEY AUTOINCREMENT, problem VARCHAR(30), answer VARCHAR(30), setId INTEGER, FOREIGN KEY (setId) REFERENCES {cardsTable}(setId));";
                 command.ExecuteNonQuery();
 
                 command.CommandText = $"CREATE TABLE IF NOT EXISTS {commentsTable} (commentsId INTEGER, title VARCHAR(20), body VARCHAR(250), FOREIGN KEY (commentsId) REFERENCES {problemsTable}(setId));";
                 command.ExecuteNonQuery();
+
+                command.CommandText = $"CREATE TABLE IF NOT EXISTS {calculatorTable} (calcId INTEGER PRIMARY KEY AUTOINCREMENT, calcName VARCHAR(120), isVisible INTEGER, calcUid INTEGER NOT NULL, calcDesc VARCHAR(512));";
+                command.ExecuteNonQuery();
+
             }
 
             connection.Close();
@@ -256,7 +261,7 @@ public class DatabaseHelper : MonoBehaviour
 
                 using (SqliteCommand cmd = new SqliteCommand(connection))
                 {
-                    cmd.CommandText = $"UPDATE {notesTable} SET title = '{t}', body = '{b}' where noteId = {nid};";
+                    cmd.CommandText = $"UPDATE {notesTable} SET title = '{t}', body = '{b}' WHERE noteId = {nid};";
                     cmd.ExecuteNonQuery();
                     success = true;
                 }
@@ -320,7 +325,6 @@ public class DatabaseHelper : MonoBehaviour
                 }
                 connection.Close();
                 status = true;
-                int temp = getCardsetId(title);
             }
         }
         catch(Exception ex)
@@ -500,6 +504,7 @@ public class DatabaseHelper : MonoBehaviour
 
                             problem.setProblem(reader["problem"].ToString());
                             problem.setAnswer(reader["answer"].ToString());
+                            problem.setId(Int32.Parse(reader["problemId"].ToString()));
 
                             allProblems.Add(problem);
                         }
@@ -517,5 +522,128 @@ public class DatabaseHelper : MonoBehaviour
         }
 
         return allProblems;
+    }
+
+    public bool updateProblemSet(int pid, string p, string a, string t, int cid)
+    {
+        bool allGood = false;
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"UPDATE {problemsTable} SET problem = '{p}', answer = '{a}' WHERE problemId = {pid};";
+                    cmd.ExecuteNonQuery();
+                    cmd.CommandText = $"UPDATE {cardsTable} SET title = '{t}' WHERE setId = {cid};";
+                    cmd.ExecuteNonQuery();
+                    allGood = true;
+                    
+                }
+
+                connection.Close();
+            }
+        }
+        catch(Exception ex)
+        {
+            Debug.Log("Error updating problem: " + ex.Message);
+        }
+
+        return allGood;
+    }
+
+    public bool dropProblemsTable()
+    {
+        bool allGood = false;
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"DROP TABLE {problemsTable};";
+                    cmd.ExecuteNonQuery();
+                    cmd.CommandText = $"DROP TABLE {cardsTable};";
+                    cmd.ExecuteNonQuery();
+
+                    allGood = true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Error deleting: " + ex.Message);
+        }
+
+
+        return allGood;
+    }
+
+    public bool deleteProblem(int pid)
+    {
+        bool allGood = false;
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"DELETE FROM {problemsTable} WHERE problemId = '{pid}';";
+                    cmd.ExecuteNonQuery();
+                    allGood = true;
+                }
+
+                connection.Close();
+            }
+        }
+        catch(Exception ex)
+        {
+            Debug.Log("Error deleting problem: " + ex.Message);
+        }
+
+        return allGood;
+    }
+
+    public bool deleteCardSet(int csid)
+    {
+        bool allGood = false;
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"DELETE FROM {cardsTable} WHERE setId = '{csid}';";
+                    cmd.ExecuteNonQuery();
+                    cmd.CommandText = $"DELETE FROM {problemsTable} WHERE setId = '{csid}';";
+                    cmd.ExecuteNonQuery();
+                    allGood = true;
+                }
+
+                connection.Close();
+            }
+        }
+        catch(Exception ex)
+        {
+            Debug.Log("Error deleting problem: " + ex.Message);
+        }
+
+        return allGood;
     }
 }

@@ -33,4 +33,11 @@ public class UserSessionData
     {
         password = up;
     }
+
+    public void clearData()
+    {
+        userId = -1;
+        userName = "";
+        password = "";
+    }
 }

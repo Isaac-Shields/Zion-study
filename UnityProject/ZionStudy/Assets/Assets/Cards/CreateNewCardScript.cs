@@ -13,6 +13,8 @@ public class CreateNewCardScript : MonoBehaviour
     public TMP_InputField answer;
     public MasterScript master;
     public DatabaseHelper dbHelper;
+    private int operation;
+    public PracticeCanvasMaster pcm;
 
     private void Start() 
     {
@@ -22,10 +24,22 @@ public class CreateNewCardScript : MonoBehaviour
 
     private void closeThisCanvas()
     {
-        question.text = "";
-        answer.text = "";
-        master.closeAddCardsCanvas();
-        master.startCalculatorCanvas();
+        if(operation == 0)
+        {
+            question.text = "";
+            answer.text = "";
+            master.closeAddCardsCanvas();
+            master.startCardsCanvas();
+            operation = 0;
+        }
+        else if(operation == 1)
+        {
+            question.text = "";
+            answer.text = "";
+            master.closeAddCardsCanvas();
+            pcm.loadCards(master.curCard.getCardsetTitle());
+            operation = 0;
+        }
     }
 
     private void checkCardset()
@@ -33,6 +47,7 @@ public class CreateNewCardScript : MonoBehaviour
         if(master.curCard.getSetId() == -1)
         {
             createCardset();
+            master.curCard.setCardsetTitle(title.text);
         }
         else
         {
@@ -44,6 +59,7 @@ public class CreateNewCardScript : MonoBehaviour
     {
         if(dbHelper.createCardset(title.text, master.curSessionData.getUserId()))
         {
+            master.curCard.setId(dbHelper.getCardsetId(title.text));
             if(question.text.Length > 0 && answer.text.Length > 0)
             {
                 addCard();
@@ -69,6 +85,11 @@ public class CreateNewCardScript : MonoBehaviour
         {
             Debug.Log("Error adding card");
         }
+    }
+
+    public void setAltOperation(int opN)
+    {
+        operation = opN;
     }
 
 

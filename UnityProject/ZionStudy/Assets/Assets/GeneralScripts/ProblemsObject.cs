@@ -4,6 +4,7 @@ public class problemObj
 {
     private string problem;
     private string answer;
+    private int problemId;
 
     public problemObj()
     {
@@ -28,5 +29,15 @@ public class problemObj
     public void setAnswer(string a)
     {
         answer = a;
+    }
+
+    public void setId(int id)
+    {
+        problemId = id;
+    }
+
+    public int getId()
+    {
+        return problemId;
     }
 }

@@ -26,10 +26,11 @@ public class CardsMasterScript : MonoBehaviour
     {
         master.closeNavBarCanvas();
         master.closeCardsCanvas();
+        master.curCard.clearData();
         cardsetNameCanvas.SetActive(true);
     }
 
-    private void fillCardsets()
+    public void fillCardsets()
     {
         cardsetTitles = dbHelper.getPrivateCardsets(master.curSessionData.getUserId());
         foreach(Transform child in privateContent)
