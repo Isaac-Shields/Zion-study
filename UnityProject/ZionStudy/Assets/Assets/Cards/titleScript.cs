@@ -10,13 +10,13 @@ public class titleScript : MonoBehaviour
     public Button continueBtn;
     public TMP_InputField title;
     public MasterScript master;
-
     private void Start() 
     {
         cancelBtn.onClick.AddListener(goBack);
         continueBtn.onClick.AddListener(startAddCard);
     }
 
+    //Go back
     private void goBack()
     {
         this.gameObject.SetActive(false);
@@ -25,6 +25,7 @@ public class titleScript : MonoBehaviour
         title.text = "";
     }
 
+    //Start the next canvas
     private void startAddCard()
     {
         master.curCard.setCardsetTitle(title.text);

@@ -22,6 +22,7 @@ public class CreateNewCardScript : MonoBehaviour
         addCardBtn.onClick.AddListener(checkCardset);    
     }
 
+    //Close this canvas
     private void closeThisCanvas()
     {
         if(operation == 0)
@@ -42,6 +43,7 @@ public class CreateNewCardScript : MonoBehaviour
         }
     }
 
+    //If there's no cardset, create one, else, add a card to the existing cardset
     private void checkCardset()
     {
         if(master.curCard.getSetId() == -1)
@@ -55,6 +57,7 @@ public class CreateNewCardScript : MonoBehaviour
         }
     }
 
+    //Create cardset
     private void createCardset()
     {
         if(dbHelper.createCardset(title.text, master.curSessionData.getUserId()))
@@ -73,6 +76,7 @@ public class CreateNewCardScript : MonoBehaviour
         }
     }
 
+    //Add a card to a cardset
     private void addCard()
     {
         if(dbHelper.addCardToCardset(question.text, answer.text, master.curCard.getSetId()))
@@ -87,6 +91,7 @@ public class CreateNewCardScript : MonoBehaviour
         }
     }
 
+    //setter
     public void setAltOperation(int opN)
     {
         operation = opN;

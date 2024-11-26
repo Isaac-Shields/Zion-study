@@ -41,6 +41,7 @@ public class LoginMasterScript : MonoBehaviour
                     master.curSessionData.setUsername(loginUsername.text);
                     master.curSessionData.setUserPassword(loginPassword.text);
                     master.curSessionData.setUserId(uid);
+                    master.curSessionData.setAdminLevel(masterObj.GetComponent<DatabaseHelper>().getUserLevel(master.curSessionData.getUserId()));
                     master.cleanUpBeforeSwitch();
                     master.startCalculatorCanvas();
                     master.startNavBarCanvas();

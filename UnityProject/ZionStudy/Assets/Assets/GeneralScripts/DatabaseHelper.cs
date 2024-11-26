@@ -40,7 +40,7 @@ public class DatabaseHelper : MonoBehaviour
 
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = $@"CREATE TABLE IF NOT EXISTS {usersTable} (userId INTEGER PRIMARY KEY AUTOINCREMENT, username VARCHAR(25) NOT NULL, password VARCHAR(20), isAdmin INTEGER);";
+                command.CommandText = $"CREATE TABLE IF NOT EXISTS {usersTable} (userId INTEGER PRIMARY KEY AUTOINCREMENT, username VARCHAR(25) NOT NULL, password VARCHAR(20), isAdmin INTEGER);";
                 command.ExecuteNonQuery();
 
                 command.CommandText = $"CREATE TABLE IF NOT EXISTS {notesTable} (noteId INTEGER PRIMARY KEY AUTOINCREMENT, title VARCHAR(128), body VARCHAR(512), userId INTEGER, FOREIGN KEY (userId) REFERENCES {usersTable}(userId));";
@@ -104,7 +104,7 @@ public class DatabaseHelper : MonoBehaviour
 
                 using(SqliteCommand cmd = new SqliteCommand(connection))
                 {
-                    cmd.CommandText = $"INSERT INTO {usersTable} (username, password, isAdmin) VALUES ('{usernameFS}', '{password}', 'FALSE');";
+                    cmd.CommandText = $"INSERT INTO {usersTable} (username, password, isAdmin) VALUES ('{usernameFS}', '{password}', '0');";
                     cmd.ExecuteNonQuery();
                 }
                 connection.Close();
@@ -646,4 +646,166 @@ public class DatabaseHelper : MonoBehaviour
 
         return allGood;
     }
+
+    public bool updatePassword(int uid, string pw)
+    {
+        bool allGood = false;
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"UPDATE {usersTable} SET password = '{pw}' WHERE userId = '{uid}';";
+                    cmd.ExecuteNonQuery();
+                    allGood = true;
+                }
+            }
+        }
+        catch(Exception ex)
+        {
+            Debug.Log("Error updating password: " + ex.Message);
+        }
+
+        return allGood;
+    }
+
+    public bool updateAdminLevel(int uid, int level)
+    {
+        bool allGood = false;
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"UPDATE {usersTable} SET isAdmin = '{level}' WHERE userId = '{uid}';";
+                    cmd.ExecuteNonQuery();
+                    allGood = true;
+                }
+
+                connection.Close();
+            }
+
+        }
+        catch(Exception ex)
+        {
+            Debug.Log("Error updating user level: " + ex.Message);
+        }
+
+        return allGood;
+    }
+
+    public int getUserLevel(int uid)
+    {
+        int level = -1;
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"SELECT isAdmin FROM {usersTable} WHERE userId = {uid};";
+                    using(SqliteDataReader reader = cmd.ExecuteReader())
+                    {
+                        level = Int32.Parse(reader["isAdmin"].ToString());
+                    }
+                }
+
+                connection.Close();
+            }
+        }
+        catch(Exception ex)
+        {
+            Debug.Log("Error getting user level: " + ex.Message);
+        }
+
+        return level;
+    }
+
+    public bool deleteUser(int uid)
+    {
+        bool allGood = false;
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    bool subOperation;
+                    cmd.CommandText = $"DELETE FROM {notesTable} where userId = '{uid}';";
+                    cmd.ExecuteNonQuery();
+                    cmd.CommandText = $"DELETE FROM {cardsTable} WHERE userId = '{uid}';";
+                    cmd.ExecuteNonQuery();
+                    subOperation = deleteOrphanProblems();
+                    cmd.CommandText = $"DELETE FROM {usersTable} WHERE userId = '{uid}';";
+                    cmd.ExecuteNonQuery();
+                    if(subOperation)
+                    {
+                        allGood = true;
+                    }
+                }
+
+                connection.Close();
+            }
+        }
+        catch(Exception ex)
+        {
+            Debug.Log("Error deleting user: " + ex.Message);
+        }
+
+        return allGood;
+    }
+
+    private bool deleteOrphanProblems()
+    {
+        bool allGood = false;
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"DELETE FROM {problemsTable} where setId NOT IN (SELECT setId FROM {cardsTable});";
+                    cmd.ExecuteNonQuery();
+                    allGood = true;
+                }
+
+                connection.Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Error deleting problems: " + ex.Message);
+        }
+
+        return allGood;
+    }
+
+    
+
+
+
+
+
 }

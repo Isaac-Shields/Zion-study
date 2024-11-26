@@ -3,6 +3,7 @@ public class UserSessionData
     private int userId;
     private string userName;
     private string password;
+    private int isAdmin;
 
     public int getUserId()
     {
@@ -34,10 +35,21 @@ public class UserSessionData
         password = up;
     }
 
+    public void setAdminLevel(int level)
+    {
+        isAdmin = level;
+    }
+
+    public int getAdminLevel()
+    {
+        return isAdmin;
+    }
+
     public void clearData()
     {
         userId = -1;
         userName = "";
         password = "";
+        isAdmin = 0;
     }
 }

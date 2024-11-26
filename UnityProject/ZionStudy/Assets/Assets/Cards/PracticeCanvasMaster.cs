@@ -55,6 +55,7 @@ public class PracticeCanvasMaster : MonoBehaviour
         deleteSetBtn.gameObject.SetActive(false);
     }
 
+    //Load all the problems in a cardset
     public void loadCards(string t)
     {
         id = 0;
@@ -69,6 +70,7 @@ public class PracticeCanvasMaster : MonoBehaviour
         checkNums();
     }
 
+    //Reveal the answer, or hide it
     private void reveal()
     {
         if(initBtn)
@@ -85,6 +87,7 @@ public class PracticeCanvasMaster : MonoBehaviour
         }
     }
 
+    //Switch to the next problem
     private void nextCard()
     {
         if(id + 1 < allProblems.Count)
@@ -99,6 +102,7 @@ public class PracticeCanvasMaster : MonoBehaviour
 
     }
 
+    //Switch to the previous problem
     private void prevProblem()
     {
         if(id - 1 >= 0)
@@ -112,6 +116,7 @@ public class PracticeCanvasMaster : MonoBehaviour
         answer.GetComponent<TMP_InputField>().text = allProblems[id].getAnswer();
     }
 
+    //Stop the user from going out of bounds
     private void checkNums()
     {
         if(id + 1 >= allProblems.Count)
@@ -133,6 +138,7 @@ public class PracticeCanvasMaster : MonoBehaviour
         }
     }
 
+    //Go back
     private void goBack()
     {
         id = 0;
@@ -151,6 +157,7 @@ public class PracticeCanvasMaster : MonoBehaviour
     }
 
 
+    //Show buttons for editing
     private void startEditing()
     {
         title.readOnly = false;
@@ -169,6 +176,7 @@ public class PracticeCanvasMaster : MonoBehaviour
 
     }
 
+    //Update the problem
     private void saveBtnLogic()
     {
         if(originalAnswer != answer.GetComponent<TMP_InputField>().text || originalProb != problem.text || originalTitle != title.text)
@@ -201,6 +209,7 @@ public class PracticeCanvasMaster : MonoBehaviour
         }
     }
 
+    //Cancel update
     private void cancelBtnLogic()
     {
         answer.GetComponent<TMP_InputField>().text = originalAnswer;
@@ -220,6 +229,7 @@ public class PracticeCanvasMaster : MonoBehaviour
         reveal();
     }
 
+    //reset the canvas
     public void resetCanvas()
     {
         title.readOnly = true;
@@ -235,6 +245,7 @@ public class PracticeCanvasMaster : MonoBehaviour
         reveal();
     }
 
+    //start the process of deleting a problem
     private void startProblemDeletion()
     {
         confirmCanvas.SetActive(true);
@@ -242,12 +253,14 @@ public class PracticeCanvasMaster : MonoBehaviour
         confirmCanvas.GetComponent<confirmLogic>().probPos = id;
     }
 
+    //start the process of deleting a cardset
     private void startSetDeletion()
     {
         confirmCanvas.SetActive(true);
         confirmCanvas.GetComponent<confirmLogic>().operation = 2;
     }
 
+    //Start the process of adding a problem to the cardset
     private void addProblem()
     {
         master.closePracticeCardsCanvas();

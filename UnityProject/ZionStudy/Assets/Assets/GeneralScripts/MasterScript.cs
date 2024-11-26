@@ -19,6 +19,8 @@ public class MasterScript : MonoBehaviour
     public GameObject noteRud;
     public cardsetObj curCard;
     public GameObject practiceCardsCanvas;
+    public GameObject changePwCanvas;
+    public GameObject adminCanvas;
     private void Start() 
     {
         curSessionData = new UserSessionData();
@@ -27,6 +29,17 @@ public class MasterScript : MonoBehaviour
         startLoginCanvas();
     }
 
+    public void closeChangePwCanvas()
+    {
+        changePwCanvas.SetActive(false);
+        changePwCanvas.GetComponent<changePassword>().clearCanvas();
+    }
+
+    public void startChangePwCanvas()
+    {
+        cleanUpBeforeSwitch();
+        changePwCanvas.SetActive(true);
+    }
 
     public void startPracticeCardsCanvas()
     {
@@ -57,7 +70,9 @@ public class MasterScript : MonoBehaviour
     public void startSettingsCanvas()
     {
         cleanUpBeforeSwitch();
+        settingsCanvas.GetComponent<settingsPageMaster>().showAdminSettingsBtn(curSessionData.getAdminLevel());
         settingsCanvas.SetActive(true);
+
     }
 
     public void startCalculatorCanvas()
@@ -156,6 +171,25 @@ public class MasterScript : MonoBehaviour
         settingsCanvas.SetActive(false);
     }
 
+    public void startAdminSettings()
+    {
+        if(curSessionData.getAdminLevel() == 1)
+        {
+            cleanUpBeforeSwitch();
+            adminCanvas.SetActive(true);
+        }
+        else
+        {
+            //do nothing
+        }
+    }
+
+    public void closeAdminCanvas()
+    {
+        cleanUpBeforeSwitch();
+        adminCanvas.SetActive(true);
+    }
+
     public void cleanUpBeforeSwitch()
     {
         loginCanvas.SetActive(false);
@@ -168,8 +202,8 @@ public class MasterScript : MonoBehaviour
         settingsCanvas.SetActive(false);
         noteRud.SetActive(false);
         practiceCardsCanvas.SetActive(false);
-        
-
+        changePwCanvas.SetActive(false);
+        adminCanvas.SetActive(false);
     }
 
 }

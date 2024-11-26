@@ -30,6 +30,7 @@ public class CardsMasterScript : MonoBehaviour
         cardsetNameCanvas.SetActive(true);
     }
 
+    //Create cards
     public void fillCardsets()
     {
         cardsetTitles = dbHelper.getPrivateCardsets(master.curSessionData.getUserId());
