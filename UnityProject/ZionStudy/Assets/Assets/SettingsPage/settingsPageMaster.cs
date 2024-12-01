@@ -83,7 +83,6 @@ public class settingsPageMaster : MonoBehaviour
 
     public void waitForConfirmation()
     {
-        Debug.Log(taskNumber);
         if(taskNumber == 1)
         {
             if(dbHelper.deleteUser(master.curSessionData.getUserId()))

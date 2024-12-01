@@ -15,7 +15,6 @@ public class PracticeCanvasMaster : MonoBehaviour
     public Button prevBtn;
     public Button nextBtn;
     private int id;
-    private List<problemObj> allProblems;
     public Button goBackBtn;
     public Button editBtn;
     public Button saveBtn;
@@ -30,6 +29,7 @@ public class PracticeCanvasMaster : MonoBehaviour
     public GameObject confirmCanvas;
     public Button addProblemBtn;
     public CreateNewCardScript ccs;
+    private List<problemObj> allProblems = new List<problemObj>();
 
     private void Start() 
     {
@@ -56,18 +56,30 @@ public class PracticeCanvasMaster : MonoBehaviour
     }
 
     //Load all the problems in a cardset
-    public void loadCards(string t)
+    public void loadAllProblems(string t, int sid)
     {
+        allProblems.Clear();
         id = 0;
         master.curCard.setCardsetTitle(t);
-        allProblems = dbHelper.getAllProblems(t);
+        master.curCard.setId(sid);
+        allProblems = dbHelper.getAllProblems(sid);
         master.closeCardsCanvas();
         master.startPracticeCardsCanvas();
         master.closeNavBarCanvas();
+        Debug.Log(master.curCard.getSetId());
+        Debug.Log(allProblems.Count);
         problem.text = allProblems[id].getProblem();
         answer.GetComponent<TMP_InputField>().text = allProblems[id].getAnswer();
         title.text = t;
         checkNums();
+        if(dbHelper.getCardsetPublicState(master.curCard.getSetId()))
+        {
+            editBtn.gameObject.SetActive(false);
+        }
+        else
+        {
+            editBtn.gameObject.SetActive(true);
+        }
     }
 
     //Reveal the answer, or hide it
@@ -90,6 +102,7 @@ public class PracticeCanvasMaster : MonoBehaviour
     //Switch to the next problem
     private void nextCard()
     {
+        Debug.Log("Button pressed! (next)");
         if(id + 1 < allProblems.Count)
         {
             id++;
@@ -105,6 +118,7 @@ public class PracticeCanvasMaster : MonoBehaviour
     //Switch to the previous problem
     private void prevProblem()
     {
+        Debug.Log("Button pressed! (prev)");
         if(id - 1 >= 0)
         {
             id--;
@@ -119,22 +133,22 @@ public class PracticeCanvasMaster : MonoBehaviour
     //Stop the user from going out of bounds
     private void checkNums()
     {
-        if(id + 1 >= allProblems.Count)
-        {
-            nextBtn.interactable = false;
-        }
-        else
+        if(id + 1 < allProblems.Count)
         {
             nextBtn.interactable = true;
         }
-
-        if(id - 1 < 0)
+        else
         {
-            prevBtn.interactable = false;
+            nextBtn.interactable = false;
+        }
+
+        if(id - 1 >= 0)
+        {
+            prevBtn.interactable = true;
         }
         else
         {
-            prevBtn.interactable = true;
+            prevBtn.interactable = false;
         }
     }
 
@@ -142,6 +156,7 @@ public class PracticeCanvasMaster : MonoBehaviour
     private void goBack()
     {
         id = 0;
+        allProblems.Clear();
         initBtn = true;
         answer.SetActive(false);
         title.readOnly = true;
@@ -232,6 +247,7 @@ public class PracticeCanvasMaster : MonoBehaviour
     //reset the canvas
     public void resetCanvas()
     {
+        id = 0;
         title.readOnly = true;
         saveBtn.gameObject.SetActive(false);
         cancelBtn.gameObject.SetActive(false);

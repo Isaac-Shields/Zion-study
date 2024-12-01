@@ -12,7 +12,7 @@ public class CardsMasterScript : MonoBehaviour
     public Transform privateContent;
     public Transform publicContent;
     public GameObject cardsetTemplate;
-    public List<string> cardsetTitles;
+    public List<cardsetObj> cardsetTitles;
     public DatabaseHelper dbHelper;
     public PracticeCanvasMaster pcm;
 
@@ -20,6 +20,7 @@ public class CardsMasterScript : MonoBehaviour
     {
         createNewCardSet.onClick.AddListener(openCreateCardsCanvas);
         fillCardsets();
+        fillPublicCardset();
     }
 
     private void openCreateCardsCanvas()
@@ -39,12 +40,29 @@ public class CardsMasterScript : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        foreach(string title in cardsetTitles)
+        foreach(cardsetObj curCard in cardsetTitles)
         {
             GameObject listItem = Instantiate(cardsetTemplate, privateContent);
             Button link = listItem.GetComponent<Button>();
-            link.onClick.AddListener(() => pcm.loadCards(title));
-            link.GetComponentInChildren<TextMeshProUGUI>().text = title;
+            link.onClick.AddListener(() => pcm.loadAllProblems(curCard.getCardsetTitle(), curCard.getSetId()));
+            link.GetComponentInChildren<TextMeshProUGUI>().text = curCard.getCardsetTitle();
+        }
+    }
+
+    public void fillPublicCardset()
+    {
+        List<cardsetObj> publicCards = dbHelper.getPublicCardsets();
+        foreach(Transform child in publicContent)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach(cardsetObj curCard in publicCards)
+        {
+            GameObject listItem = Instantiate(cardsetTemplate, publicContent);
+            Button link = listItem.GetComponent<Button>();
+            link.onClick.AddListener(() => pcm.loadAllProblems(curCard.getCardsetTitle(), curCard.getSetId()));
+            link.GetComponentInChildren<TextMeshProUGUI>().text = curCard.getCardsetTitle();
         }
     }
 }

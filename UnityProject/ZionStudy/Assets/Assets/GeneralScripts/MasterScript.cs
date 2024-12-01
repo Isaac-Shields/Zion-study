@@ -176,6 +176,7 @@ public class MasterScript : MonoBehaviour
         if(curSessionData.getAdminLevel() == 1)
         {
             cleanUpBeforeSwitch();
+            adminCanvas.GetComponent<AdminMasterScript>().loadPendingCardsets();
             adminCanvas.SetActive(true);
         }
         else

@@ -38,7 +38,7 @@ public class CreateNewCardScript : MonoBehaviour
             question.text = "";
             answer.text = "";
             master.closeAddCardsCanvas();
-            pcm.loadCards(master.curCard.getCardsetTitle());
+            pcm.loadAllProblems(master.curCard.getCardsetTitle(), master.curSessionData.getUserId());
             operation = 0;
         }
     }
@@ -62,7 +62,7 @@ public class CreateNewCardScript : MonoBehaviour
     {
         if(dbHelper.createCardset(title.text, master.curSessionData.getUserId()))
         {
-            master.curCard.setId(dbHelper.getCardsetId(title.text));
+            master.curCard.setId(dbHelper.getCardsetId(title.text, master.curSessionData.getUserId()));
             if(question.text.Length > 0 && answer.text.Length > 0)
             {
                 addCard();

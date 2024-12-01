@@ -30,7 +30,7 @@ public class confirmLogic : MonoBehaviour
         if(operation == 1)
         {
             //delete problem
-            allProblems = dbHelper.getAllProblems(master.curCard.getCardsetTitle());
+            allProblems = dbHelper.getAllProblems(master.curCard.getSetId());
             if(allProblems.Count == 1)
             {
                 if(dbHelper.deleteCardSet(master.curCard.getSetId()))
@@ -46,7 +46,7 @@ public class confirmLogic : MonoBehaviour
                 if(dbHelper.deleteProblem(allProblems[probPos].getId()))
                 {
                     allGood = true;
-                    pcm.loadCards(master.curCard.getCardsetTitle());
+                    pcm.loadAllProblems(master.curCard.getCardsetTitle(), master.curSessionData.getUserId());
                 }
             }
             if(!allGood)

@@ -62,9 +62,8 @@ public class DatabaseHelper : MonoBehaviour
 
             connection.Close();
         }
+
     }
-
-
     //Checks if the username entered is valid (unique)
     public bool newUserName(string username)
     {
@@ -89,7 +88,6 @@ public class DatabaseHelper : MonoBehaviour
 
         return validUsername;
     }
-
     //Adds a new user to the database
     public bool addNewUser(string usernameFS, string password)
     {
@@ -119,7 +117,6 @@ public class DatabaseHelper : MonoBehaviour
 
         return userAdded;
     }
-
     //Get userId
     public int getSessionData(string username, string password)
     {
@@ -144,7 +141,6 @@ public class DatabaseHelper : MonoBehaviour
         }
         return userId;
     }
-
     //Checks if the username and password are correct
     public bool validCredentials(string usernameSent, string passwordSent)
     {
@@ -171,7 +167,6 @@ public class DatabaseHelper : MonoBehaviour
         return validLoginDetails;
 
     }
-
     //Adds a note to the database
     public bool addNoteToDatabase(string title, string body, int userId)
     {
@@ -201,7 +196,6 @@ public class DatabaseHelper : MonoBehaviour
 
         return validOperation;
     }
-
     //Returns a list of all the notes belonging to a user
     public List<notesObj> getAllNotesFromDatabase(int uid)
     {
@@ -245,7 +239,6 @@ public class DatabaseHelper : MonoBehaviour
 
         return notes;
     }
-
     //Updates an existing note
     public bool updateNotes(string t, string b, int nid)
     {
@@ -276,7 +269,6 @@ public class DatabaseHelper : MonoBehaviour
 
         return success;
     }
-
     //Deletes a not from the database
     public bool deleteNote(int nid)
     {
@@ -306,7 +298,6 @@ public class DatabaseHelper : MonoBehaviour
 
         return success;
     }
-
     public bool createCardset(string title, int uid)
     {
         bool status = false;
@@ -334,7 +325,6 @@ public class DatabaseHelper : MonoBehaviour
 
         return status;
     }
-
     public bool addCardToCardset(string problem, string answer, int cid)
     {
         bool status = false;
@@ -362,8 +352,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return status;
     }
-
-    public int getCardsetId(string title)
+    public int getCardsetId(string title, int uid)
     {
         int setId = -1;
         try
@@ -374,7 +363,7 @@ public class DatabaseHelper : MonoBehaviour
                 connection.Open();
                 using(SqliteCommand cmd = new SqliteCommand(connection))
                 {
-                    cmd.CommandText = $"SELECT * FROM {cardsTable} WHERE title = '{title}' ;";
+                    cmd.CommandText = $"SELECT * FROM {cardsTable} WHERE title = '{title}' AND userId = '{uid}';";
                     using(SqliteDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
@@ -404,10 +393,9 @@ public class DatabaseHelper : MonoBehaviour
 
         return setId;
     }
-
-    public List<string> getPrivateCardsets(int uid)
+    public List<cardsetObj> getPrivateCardsets(int uid)
     {
-        List<string> allTitles = new List<string>();
+        List<cardsetObj> allPrivateProbs = new List<cardsetObj>();
 
         try
         {
@@ -424,7 +412,10 @@ public class DatabaseHelper : MonoBehaviour
                         {
                             while (reader.Read())
                             {
-                                allTitles.Add(reader["title"].ToString());
+                                cardsetObj curCard = new cardsetObj();
+                                curCard.setCardsetTitle(reader["title"].ToString());
+                                curCard.setId(Int32.Parse(reader["setId"].ToString()));
+                                allPrivateProbs.Add(curCard);
                             }
 
                             reader.Close();
@@ -439,12 +430,11 @@ public class DatabaseHelper : MonoBehaviour
             Debug.Log("Error getting cardsets: " + ex.Message);
         }
 
-        return allTitles;
+        return allPrivateProbs;
     }
-
-    public List<string> getPublicCardsets()
+    public List<cardsetObj> getPublicCardsets()
     {
-        List<string> allTitles = new List<string>();
+        List<cardsetObj> allCards = new List<cardsetObj>();
 
         try
         {
@@ -455,13 +445,16 @@ public class DatabaseHelper : MonoBehaviour
 
                 using (SqliteCommand cmd = new SqliteCommand(connection))
                 {
-                    cmd.CommandText = $"SELECT * FROM {cardsTable} WHERE isPublic = '1';";
+                    cmd.CommandText = $"SELECT * FROM {cardsTable} WHERE isPublic = '{2}';";
 
                         using(SqliteDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                allTitles.Add(reader["title"].ToString());
+                                cardsetObj curCard = new cardsetObj();
+                                curCard.setCardsetTitle(reader["title"].ToString());
+                                curCard.setId(Int32.Parse(reader["setId"].ToString()));
+                                allCards.Add(curCard);
                             }
 
                             reader.Close();
@@ -476,16 +469,14 @@ public class DatabaseHelper : MonoBehaviour
             Debug.Log("Error getting cardsets: " + ex.Message);
         }
 
-        return allTitles;
+        return allCards;
     }
-
-    public List<problemObj> getAllProblems(string title)
+    public List<problemObj> getAllProblems(int sid)
     {
         List<problemObj> allProblems = new List<problemObj>();
 
         try
         {
-            int setId = getCardsetId(title);
             string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
 
             using(SqliteConnection connection = new SqliteConnection(connectionString))
@@ -494,7 +485,7 @@ public class DatabaseHelper : MonoBehaviour
 
                 using(SqliteCommand cmd = new SqliteCommand(connection))
                 {
-                    cmd.CommandText = $"SELECT * FROM {problemsTable} WHERE setId = '{setId}' ;";
+                    cmd.CommandText = $"SELECT * FROM {problemsTable} WHERE setId = '{sid}';";
 
                     using(SqliteDataReader reader = cmd.ExecuteReader())
                     {
@@ -523,7 +514,6 @@ public class DatabaseHelper : MonoBehaviour
 
         return allProblems;
     }
-
     public bool updateProblemSet(int pid, string p, string a, string t, int cid)
     {
         bool allGood = false;
@@ -555,7 +545,6 @@ public class DatabaseHelper : MonoBehaviour
 
         return allGood;
     }
-
     public bool dropProblemsTable()
     {
         bool allGood = false;
@@ -586,7 +575,6 @@ public class DatabaseHelper : MonoBehaviour
 
         return allGood;
     }
-
     public bool deleteProblem(int pid)
     {
         bool allGood = false;
@@ -615,7 +603,6 @@ public class DatabaseHelper : MonoBehaviour
 
         return allGood;
     }
-
     public bool deleteCardSet(int csid)
     {
         bool allGood = false;
@@ -646,7 +633,6 @@ public class DatabaseHelper : MonoBehaviour
 
         return allGood;
     }
-
     public bool updatePassword(int uid, string pw)
     {
         bool allGood = false;
@@ -673,7 +659,6 @@ public class DatabaseHelper : MonoBehaviour
 
         return allGood;
     }
-
     public bool updateAdminLevel(int uid, int level)
     {
         bool allGood = false;
@@ -703,7 +688,6 @@ public class DatabaseHelper : MonoBehaviour
 
         return allGood;
     }
-
     public int getUserLevel(int uid)
     {
         int level = -1;
@@ -734,7 +718,6 @@ public class DatabaseHelper : MonoBehaviour
 
         return level;
     }
-
     public bool deleteUser(int uid)
     {
         bool allGood = false;
@@ -772,7 +755,6 @@ public class DatabaseHelper : MonoBehaviour
 
         return allGood;
     }
-
     private bool deleteOrphanProblems()
     {
         bool allGood = false;
@@ -801,11 +783,127 @@ public class DatabaseHelper : MonoBehaviour
 
         return allGood;
     }
+    public List<cardsetObj> getCardsetsForApproval()
+    {
+        List<cardsetObj> cards = new List<cardsetObj>();
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"SELECT * FROM {cardsTable} WHERE isPublic = '{1}' ;";
+                    using(SqliteDataReader reader = cmd.ExecuteReader())
+                    {
+                        Debug.Log("Getting cardsets");
+                        while (reader.Read())
+                        {
+                            cardsetObj curCardset = new cardsetObj();
+                            curCardset.setCardsetTitle(reader["title"].ToString());
+                            curCardset.setId(Convert.ToInt32(reader["setId"].ToString()));
+                            cards.Add(curCardset);
+                        }
+                        reader.Close();
+                    }
+                }
+                connection.Close();
+            }
 
-    
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Error: " + " Line 810, " + ex.Message);
+        }
 
+        return cards;
+    }
+    public bool changeCardsetToPublic(int cid)
+    {
+        bool allGood = false;
 
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
 
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"UPDATE {cardsTable} SET isPublic = '{2}' WHERE setId = '{cid}';";
+                    cmd.ExecuteNonQuery();
+                    allGood = true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Error making cardset public: " + ex.Message);
+        }
 
+        return allGood;
+    }
+    public bool getCardsetPublicState(int sid)
+    {
+        bool isPublic = false;
+        int level = -1;
 
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"SELECT isPublic FROM {cardsTable} WHERE setId = '{sid}';";
+                    using(SqliteDataReader reader = cmd.ExecuteReader())
+                    {
+                        level = Int32.Parse(reader["isPublic"].ToString());
+                        if(level != 0)
+                        {
+                            isPublic = true;
+                        }
+                    }
+                }
+
+                connection.Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Error getting public level: " + ex.Message);
+        }
+
+        return isPublic;
+    }
+
+    public void dropCardsTable()
+    {
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"DROP TABLE {cardsTable}";
+                    cmd.ExecuteNonQuery();
+                    cmd.CommandText = $"DROP TABLE {problemsTable}";
+                    cmd.ExecuteNonQuery();
+                }
+
+                connection.Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Error deleting problems: " + ex.Message);
+        }
+    }
 }
