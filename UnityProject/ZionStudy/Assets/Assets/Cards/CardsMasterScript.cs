@@ -15,6 +15,8 @@ public class CardsMasterScript : MonoBehaviour
     public List<cardsetObj> cardsetTitles;
     public DatabaseHelper dbHelper;
     public PracticeCanvasMaster pcm;
+    public publicCardsetPreview pcp;
+    public fillNewListview fnlv;
 
     void Start()
     {
@@ -61,7 +63,7 @@ public class CardsMasterScript : MonoBehaviour
         {
             GameObject listItem = Instantiate(cardsetTemplate, publicContent);
             Button link = listItem.GetComponent<Button>();
-            link.onClick.AddListener(() => pcm.loadAllProblems(curCard.getCardsetTitle(), curCard.getSetId()));
+            link.onClick.AddListener(() => fnlv.showData(curCard.getSetId(), curCard.getCardsetTitle()));
             link.GetComponentInChildren<TextMeshProUGUI>().text = curCard.getCardsetTitle();
         }
     }

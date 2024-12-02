@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement style="flex-grow: 1; align-items: auto; justify-content: space-between; flex-direction: column; align-self: auto;">
+        <ui:GroupBox style="background-color: rgba(137, 68, 68, 0.55); align-self: center; flex-direction: row;">
+            <ui:Button text="Go back" parse-escape-sequences="true" display-tooltip-when-elided="true" name="goBackBtn" />
+            <ui:Button text="Add" parse-escape-sequences="true" display-tooltip-when-elided="true" name="addCommentBtn" />
+            <ui:Button text="Open cardset" parse-escape-sequences="true" display-tooltip-when-elided="true" name="continueBtn" />
+        </ui:GroupBox>
+        <ui:Label tabindex="-1" text="Comments" parse-escape-sequences="true" display-tooltip-when-elided="true" style="align-self: center; align-items: stretch; width: 50%; color: rgb(0, 0, 0); -unity-text-align: upper-center; font-size: 25%;" />
+        <ui:ListView name="commentLV" virtualization-method="DynamicHeight" show-border="false" header-title="Comments" show-add-remove-footer="false" reorder-mode="Simple" style="background-color: rgba(152, 196, 197, 0.71); width: 100%; height: 100%; color: rgb(0, 0, 0);" />
+    </ui:VisualElement>
+</ui:UXML>

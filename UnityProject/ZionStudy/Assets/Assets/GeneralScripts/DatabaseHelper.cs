@@ -20,6 +20,7 @@ public class DatabaseHelper : MonoBehaviour
 
     void Start ()
     {
+        //get the database path and create the database
         dbPath = Path.Combine(Application.persistentDataPath, DatabaseName);
         CreateDB();
     }
@@ -46,13 +47,13 @@ public class DatabaseHelper : MonoBehaviour
                 command.CommandText = $"CREATE TABLE IF NOT EXISTS {notesTable} (noteId INTEGER PRIMARY KEY AUTOINCREMENT, title VARCHAR(128), body VARCHAR(512), userId INTEGER, FOREIGN KEY (userId) REFERENCES {usersTable}(userId));";
                 command.ExecuteNonQuery();
 
-                command.CommandText = $"CREATE TABLE IF NOT EXISTS {cardsTable} (setId INTEGER PRIMARY KEY AUTOINCREMENT, title VARCHAR(20), isPublic INTEGER, commentsId INTEGER, userId INTEGER, FOREIGN KEY (userId) REFERENCES {usersTable}(userId));";
+                command.CommandText = $"CREATE TABLE IF NOT EXISTS {cardsTable} (setId INTEGER PRIMARY KEY AUTOINCREMENT, title VARCHAR(20), isPublic INTEGER, userId INTEGER, FOREIGN KEY (userId) REFERENCES {usersTable}(userId));";
                 command.ExecuteNonQuery();
 
                 command.CommandText = $"CREATE TABLE IF NOT EXISTS {problemsTable} (problemId INTEGER PRIMARY KEY AUTOINCREMENT, problem VARCHAR(30), answer VARCHAR(30), setId INTEGER, FOREIGN KEY (setId) REFERENCES {cardsTable}(setId));";
                 command.ExecuteNonQuery();
 
-                command.CommandText = $"CREATE TABLE IF NOT EXISTS {commentsTable} (commentsId INTEGER, title VARCHAR(20), body VARCHAR(250), FOREIGN KEY (commentsId) REFERENCES {problemsTable}(setId));";
+                command.CommandText = $"CREATE TABLE IF NOT EXISTS {commentsTable} (commentsId INTEGER PRIMARY KEY AUTOINCREMENT, title VARCHAR(20), body VARCHAR(250), setId INTEGER, FOREIGN KEY (setId) REFERENCES {problemsTable}(setId));";
                 command.ExecuteNonQuery();
 
                 command.CommandText = $"CREATE TABLE IF NOT EXISTS {calculatorTable} (calcId INTEGER PRIMARY KEY AUTOINCREMENT, calcName VARCHAR(120), isVisible INTEGER, calcUid INTEGER NOT NULL, calcDesc VARCHAR(512));";
@@ -298,6 +299,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return success;
     }
+    //Create a cardset
     public bool createCardset(string title, int uid)
     {
         bool status = false;
@@ -325,6 +327,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return status;
     }
+    //Add a card (problem) to a cardset
     public bool addCardToCardset(string problem, string answer, int cid)
     {
         bool status = false;
@@ -352,6 +355,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return status;
     }
+    //Retrieve the cardset ID from the title and user ID
     public int getCardsetId(string title, int uid)
     {
         int setId = -1;
@@ -393,6 +397,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return setId;
     }
+    //Get a users personal cardsets
     public List<cardsetObj> getPrivateCardsets(int uid)
     {
         List<cardsetObj> allPrivateProbs = new List<cardsetObj>();
@@ -432,6 +437,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return allPrivateProbs;
     }
+    //Get all the public cardsets
     public List<cardsetObj> getPublicCardsets()
     {
         List<cardsetObj> allCards = new List<cardsetObj>();
@@ -471,6 +477,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return allCards;
     }
+   //Get all the problems in a cardset
     public List<problemObj> getAllProblems(int sid)
     {
         List<problemObj> allProblems = new List<problemObj>();
@@ -514,6 +521,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return allProblems;
     }
+    //Update cardset title and specific problem in said cardset
     public bool updateProblemSet(int pid, string p, string a, string t, int cid)
     {
         bool allGood = false;
@@ -545,6 +553,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return allGood;
     }
+   //Drop the problems table (Used in development)
     public bool dropProblemsTable()
     {
         bool allGood = false;
@@ -575,6 +584,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return allGood;
     }
+    //Delete a problem
     public bool deleteProblem(int pid)
     {
         bool allGood = false;
@@ -603,6 +613,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return allGood;
     }
+    //Delete a cardset
     public bool deleteCardSet(int csid)
     {
         bool allGood = false;
@@ -633,6 +644,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return allGood;
     }
+    //Update a users password
     public bool updatePassword(int uid, string pw)
     {
         bool allGood = false;
@@ -659,6 +671,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return allGood;
     }
+    //Update users level (Make them an admin)
     public bool updateAdminLevel(int uid, int level)
     {
         bool allGood = false;
@@ -688,6 +701,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return allGood;
     }
+    //Retrieve a users level (Check if they're an admin)
     public int getUserLevel(int uid)
     {
         int level = -1;
@@ -718,6 +732,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return level;
     }
+   //Delete a user
     public bool deleteUser(int uid)
     {
         bool allGood = false;
@@ -755,6 +770,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return allGood;
     }
+    //Delete orphan problems (happens when a cardset is deleted but the problems aren't)
     private bool deleteOrphanProblems()
     {
         bool allGood = false;
@@ -783,6 +799,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return allGood;
     }
+    //Retrieve all cardsets that need to be approved before being made public (admin only tool)
     public List<cardsetObj> getCardsetsForApproval()
     {
         List<cardsetObj> cards = new List<cardsetObj>();
@@ -819,6 +836,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return cards;
     }
+    //Change a cardset to public
     public bool changeCardsetToPublic(int cid)
     {
         bool allGood = false;
@@ -845,6 +863,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return allGood;
     }
+   //Checks if a cardset is public or not
     public bool getCardsetPublicState(int sid)
     {
         bool isPublic = false;
@@ -880,7 +899,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return isPublic;
     }
-
+    //Drop the cards table and the problems table (used in development)
     public void dropCardsTable()
     {
         try
@@ -905,5 +924,166 @@ public class DatabaseHelper : MonoBehaviour
         {
             Debug.Log("Error deleting problems: " + ex.Message);
         }
+    }
+    //Add a comment to a cardset
+    public bool addComment(string title, string body, int sid)
+    {
+        bool allGood = false;
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"INSERT INTO {commentsTable} (title, body, setId) VALUES ('{title}', '{body}', '{sid}');";
+                    cmd.ExecuteNonQuery();
+                    allGood = true;
+                }
+                
+                connection.Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Error adding comment: " + ex.Message);
+        }
+
+        return allGood;
+    }
+   //Retrieve all comments tied to a public cardset
+   public List<commentObj> getComments(int sid)
+    {
+        List<commentObj> comments = new List<commentObj>();
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"SELECT * FROM {commentsTable} WHERE setId = '{sid}';";
+
+                    using(SqliteDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            commentObj commentData = new commentObj();
+                            commentData.setTitle(reader["title"].ToString());
+                            commentData.setBody(reader["body"].ToString());
+                            commentData.setSetId(sid);
+                            commentData.setCommentId(Int32.Parse(reader["commentsId"].ToString()));
+                            comments.Add(commentData);
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Error adding comment: " + ex.Message);
+        }
+
+        return comments;
+
+    }
+    //Drop comments table (This is used in development)
+    public void dropCommentsTable()
+    {
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"DROP TABLE {commentsTable};";
+                    cmd.ExecuteNonQuery();
+                }
+
+                connection.Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Error dropping comments table: " + ex.Message);
+        }
+
+    }
+    //Get all users and their information
+    public List<userObject> getAllUsers()
+    {
+        List<userObject> users = new List<userObject>();
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"SELECT * FROM {usersTable};";
+
+                    using(SqliteDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            userObject curUser = new userObject();
+                            curUser.setUid(Int32.Parse(reader["userId"].ToString()));
+                            curUser.setUserName(reader["username"].ToString());
+                            curUser.setPassword(reader["password"].ToString());
+                            curUser.setUserLevel(Int32.Parse(reader["isAdmin"].ToString()));
+                            users.Add(curUser);
+
+                        }
+                    }
+                }
+
+                connection.Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Error getting users: " + ex.Message);
+        }
+
+        return users;
+    }
+    public bool updateUser(userObject user)
+    {
+        bool allGood = false;
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"UPDATE {usersTable} SET username = '{user.getUserName()}', password = '{user.getUserPassword()}' WHERE userId = '{user.getUid()}';";
+                    cmd.ExecuteNonQuery();
+                    allGood = true;
+                }
+
+                connection.Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Error updating user: " + ex.Message);
+        }
+
+        return allGood;
     }
 }
