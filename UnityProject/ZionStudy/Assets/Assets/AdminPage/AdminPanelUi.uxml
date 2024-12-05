@@ -3,14 +3,6 @@
         <ui:VisualElement name="VisualElement" style="flex-grow: 1;">
             <ui:Button text="Go back" parse-escape-sequences="true" display-tooltip-when-elided="true" name="goBackBtn" style="width: 10%; height: 10%; color: rgb(0, 0, 0);" />
         </ui:VisualElement>
-        <ui:GroupBox name="userContainer" style="height: 100%; width: 25%;">
-            <ui:GroupBox style="flex-direction: row; justify-content: space-around;">
-                <ui:Label tabindex="-1" text="Users" parse-escape-sequences="true" display-tooltip-when-elided="true" style="background-color: rgba(0, 0, 0, 0); color: rgb(0, 0, 0); font-size: 20px;" />
-                <ui:TextField picking-mode="Ignore" value="search for user..." name="inputBox" />
-                <ui:Button text="Search" parse-escape-sequences="true" display-tooltip-when-elided="true" name="searchBtn" />
-            </ui:GroupBox>
-            <ui:ListView name="userLv" style="background-color: rgba(255, 255, 255, 0.18); height: 100%; width: 100%;" />
-        </ui:GroupBox>
         <ui:GroupBox name="cardsetContainer" style="height: 100%; width: 25%;">
             <ui:Label tabindex="-1" text="Cardsets" parse-escape-sequences="true" display-tooltip-when-elided="true" style="font-size: 20px; color: rgb(0, 0, 0);" />
             <ui:ListView name="cardsetLv" style="background-color: rgba(255, 255, 255, 0.18); height: 100%; width: 100%;" />

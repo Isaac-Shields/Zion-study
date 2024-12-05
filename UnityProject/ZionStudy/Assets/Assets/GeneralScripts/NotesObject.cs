@@ -2,7 +2,7 @@ public class notesObj
 {
     private string title;
     private string body;
-    private int noteId;
+    private int noteId = -1;
 
     public notesObj()
     {

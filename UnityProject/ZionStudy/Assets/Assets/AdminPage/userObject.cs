@@ -7,7 +7,7 @@ public class userObject
     private int userId;
     private string userName;
     private string password;
-    private int userLevel;
+    private int userLevel = -1;
 
     public void setUid(int uid)
     {

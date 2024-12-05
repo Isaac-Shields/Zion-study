@@ -58,7 +58,7 @@ public class settingsPageMaster : MonoBehaviour
     private void switchToAdminPanel()
     {
         master.closeSettingsCanvas();
-       master.startAdminSettings();
+        master.startAdminSettings();
     }
 
     public void LogoutUser()

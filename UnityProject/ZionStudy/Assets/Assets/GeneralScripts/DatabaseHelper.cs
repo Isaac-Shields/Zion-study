@@ -814,7 +814,6 @@ public class DatabaseHelper : MonoBehaviour
                     cmd.CommandText = $"SELECT * FROM {cardsTable} WHERE isPublic = '{1}' ;";
                     using(SqliteDataReader reader = cmd.ExecuteReader())
                     {
-                        Debug.Log("Getting cardsets");
                         while (reader.Read())
                         {
                             cardsetObj curCardset = new cardsetObj();
@@ -837,7 +836,7 @@ public class DatabaseHelper : MonoBehaviour
         return cards;
     }
     //Change a cardset to public
-    public bool changeCardsetToPublic(int cid)
+    public bool changeCardsetToPublic(int sid)
     {
         bool allGood = false;
 
@@ -850,7 +849,7 @@ public class DatabaseHelper : MonoBehaviour
 
                 using(SqliteCommand cmd = new SqliteCommand(connection))
                 {
-                    cmd.CommandText = $"UPDATE {cardsTable} SET isPublic = '{2}' WHERE setId = '{cid}';";
+                    cmd.CommandText = $"UPDATE {cardsTable} SET isPublic = '{2}' WHERE setId = '{sid}';";
                     cmd.ExecuteNonQuery();
                     allGood = true;
                 }
@@ -1058,7 +1057,7 @@ public class DatabaseHelper : MonoBehaviour
 
         return users;
     }
-    public bool updateUser(userObject user)
+    public bool updateUser(userObject curUser)
     {
         bool allGood = false;
 
@@ -1071,7 +1070,11 @@ public class DatabaseHelper : MonoBehaviour
 
                 using(SqliteCommand cmd = new SqliteCommand(connection))
                 {
-                    cmd.CommandText = $"UPDATE {usersTable} SET username = '{user.getUserName()}', password = '{user.getUserPassword()}' WHERE userId = '{user.getUid()}';";
+                    string uName = curUser.getUserName();
+                    string pWord = curUser.getUserPassword();
+                    int uid = curUser.getUid();
+                    int adminLevel = curUser.getUserLevel();
+                    cmd.CommandText = $"UPDATE {usersTable} SET username = '{uName}', password = '{pWord}', isAdmin = '{adminLevel}' WHERE userId = '{uid}';";
                     cmd.ExecuteNonQuery();
                     allGood = true;
                 }
@@ -1083,6 +1086,66 @@ public class DatabaseHelper : MonoBehaviour
         {
             Debug.Log("Error updating user: " + ex.Message);
         }
+
+        return allGood;
+    }
+    //Change cardset to pending aproval state
+    public bool updateToPending(int sid)
+    {
+        bool allGood = false;
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"UPDATE {cardsTable} SET isPublic = '{1}' WHERE setId = '{sid}';";
+                    cmd.ExecuteNonQuery();
+                    allGood = true;
+                }
+
+                connection.Close();
+            }
+        }
+        catch(Exception ex)
+        {
+            Debug.Log("Error changing cardset level, line 1116: " + ex.Message);
+        }
+
+
+        return allGood;
+    }
+    //Revert cardset to private
+    public bool revertCardset(int sid)
+    {
+        bool allGood = false;
+
+        try
+        {
+            string connectionString = $"URI=file:{dbPath.Replace("\\", "/")}";
+            using(SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+
+                using(SqliteCommand cmd = new SqliteCommand(connection))
+                {
+                    cmd.CommandText = $"UPDATE {cardsTable} SET isPublic = '{0}' WHERE setId = '{sid}';";
+                    cmd.ExecuteNonQuery();
+                    allGood = true;
+                }
+
+                connection.Close();
+            }
+        }
+        catch(Exception ex)
+        {
+            Debug.Log("Error changing cardset level, line 1146: " + ex.Message);
+        }
+
 
         return allGood;
     }

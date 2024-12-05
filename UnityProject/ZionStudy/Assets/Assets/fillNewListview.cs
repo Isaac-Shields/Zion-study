@@ -77,6 +77,7 @@ public class fillNewListview : MonoBehaviour
     {
         createCommentCanvas.SetActive(true);
         createCommentCanvas.GetComponent<createComment>().setId = setid;
+        gameObject.SetActive(false);
     }
 
     private void onGoBackBtnPress()

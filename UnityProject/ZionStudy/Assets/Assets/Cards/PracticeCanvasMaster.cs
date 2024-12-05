@@ -30,6 +30,7 @@ public class PracticeCanvasMaster : MonoBehaviour
     public Button addProblemBtn;
     public CreateNewCardScript ccs;
     private List<problemObj> allProblems = new List<problemObj>();
+    public Button makePublicBtn;
 
     private void Start() 
     {
@@ -53,6 +54,7 @@ public class PracticeCanvasMaster : MonoBehaviour
         answer.SetActive(false);
         deleteProblemBtn.gameObject.SetActive(false);
         deleteSetBtn.gameObject.SetActive(false);
+        makePublicBtn.onClick.AddListener(makePublic);
     }
 
     //Load all the problems in a cardset
@@ -85,6 +87,7 @@ public class PracticeCanvasMaster : MonoBehaviour
     //Reveal the answer, or hide it
     private void reveal()
     {
+        messageSender.text = "";
         if(initBtn)
         {
             answer.SetActive(true);
@@ -102,7 +105,7 @@ public class PracticeCanvasMaster : MonoBehaviour
     //Switch to the next problem
     private void nextCard()
     {
-        Debug.Log("Button pressed! (next)");
+        messageSender.text = "";
         if(id + 1 < allProblems.Count)
         {
             id++;
@@ -118,7 +121,7 @@ public class PracticeCanvasMaster : MonoBehaviour
     //Switch to the previous problem
     private void prevProblem()
     {
-        Debug.Log("Button pressed! (prev)");
+        messageSender.text = "";
         if(id - 1 >= 0)
         {
             id--;
@@ -169,6 +172,7 @@ public class PracticeCanvasMaster : MonoBehaviour
         master.closePracticeCardsCanvas();
         master.startCardsCanvas();
         master.startNavBarCanvas();
+        messageSender.text = "";
     }
 
 
@@ -283,5 +287,18 @@ public class PracticeCanvasMaster : MonoBehaviour
         master.startAddCardCanvas();
         ccs.setAltOperation(1);
 
+    }
+
+    //Submit cardset for aproval to be made public
+    private void makePublic()
+    {
+        if(dbHelper.updateToPending(master.curCard.getSetId()))
+        {
+            messageSender.text = "Cardset submitted, awaiting approval";
+        }
+        else
+        {
+            messageSender.text = "Unable to submit cardset";
+        }
     }
 }

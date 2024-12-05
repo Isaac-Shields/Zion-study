@@ -40,8 +40,18 @@ public class confirmDeletion : MonoBehaviour
 
     private void cancelDeletion()
     {
-        gameObject.SetActive(false);
-        message.text = curMessage;
+        var method = senderScript.GetType().GetMethod("cancelOperationOnWait");
+        if(method != null)
+        {
+            method.Invoke(senderScript, null);
+            gameObject.SetActive(false);
+            message.text = curMessage;
+        }
+        else
+        {
+            gameObject.SetActive(false);
+            message.text = curMessage;
+        }
     }
 
 

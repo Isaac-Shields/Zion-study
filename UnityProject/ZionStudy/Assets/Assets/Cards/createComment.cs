@@ -15,6 +15,7 @@ public class createComment : MonoBehaviour
     public GameObject masterObj;
     public int setId;
     public TextMeshProUGUI messageBox;
+    public GameObject publicUICanvas;
 
     void Start()
     {
@@ -46,6 +47,7 @@ public class createComment : MonoBehaviour
     private void onCancelBtnPress()
     {
         gameObject.SetActive(false);
+        publicUICanvas.SetActive(true);
         title.text = "";
         body.text = "";
         messageBox.text = "";

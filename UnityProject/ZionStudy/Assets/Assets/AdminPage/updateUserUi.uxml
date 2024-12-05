@@ -3,6 +3,7 @@
         <ui:TextField picking-mode="Ignore" label="User name" name="uNameBox" />
         <ui:TextField picking-mode="Ignore" label="Password" name="pWordBox" />
         <ui:GroupBox style="align-items: center;">
+            <ui:Toggle label="Admin" value="false" name="adminBox" />
             <ui:Button text="Update" parse-escape-sequences="true" display-tooltip-when-elided="true" name="updateBtn" style="width: 50%; height: auto; color: rgb(0, 0, 0); font-size: 20px; background-color: rgb(255, 255, 0);" />
             <ui:Button text="Delete" parse-escape-sequences="true" display-tooltip-when-elided="true" name="deleteBtn" style="width: 50%; background-color: rgb(207, 11, 11); color: rgb(255, 255, 255); font-size: 20px;" />
             <ui:Button text="Cancel" parse-escape-sequences="true" display-tooltip-when-elided="true" name="cancelBtn" style="width: 50%; font-size: 20px; background-color: rgb(0, 255, 0);" />

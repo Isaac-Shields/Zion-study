@@ -22,12 +22,25 @@ public class MasterScript : MonoBehaviour
     public GameObject changePwCanvas;
     public GameObject adminCanvas;
     public GameObject publicCardsetCanvas;
+    public updateUser updateUserScript;
+    public userObject userToUpdate;
     private void Start() 
     {
         curSessionData = new UserSessionData();
         curCard = new cardsetObj();
         cleanUpBeforeSwitch();
         startLoginCanvas();
+    }
+
+    public void startUpdateCanvas()
+    {
+        updateUserScript.showUI();
+        updateUserScript.fillInfo();
+    }
+
+    public void closeUpdateCanvas()
+    {
+        updateUserScript.hideUI();
     }
 
     public void startPublicCardsetCanvas()
@@ -85,6 +98,7 @@ public class MasterScript : MonoBehaviour
         cleanUpBeforeSwitch();
         settingsCanvas.GetComponent<settingsPageMaster>().showAdminSettingsBtn(curSessionData.getAdminLevel());
         settingsCanvas.SetActive(true);
+        startNavBarCanvas();
 
     }
 
@@ -189,8 +203,8 @@ public class MasterScript : MonoBehaviour
         if(curSessionData.getAdminLevel() == 1)
         {
             cleanUpBeforeSwitch();
-            adminCanvas.SetActive(true);
-            adminCanvas.GetComponent<UpdatedAdminPanel>().loadAllUsers();
+            closeNavBarCanvas();
+            adminCanvas.GetComponent<UpdatedAdminPanel>().showUI();
             adminCanvas.GetComponent<UpdatedAdminPanel>().fillPendingCardsets();
         }
         else
@@ -202,7 +216,7 @@ public class MasterScript : MonoBehaviour
     public void closeAdminCanvas()
     {
         cleanUpBeforeSwitch();
-        adminCanvas.SetActive(false);
+        adminCanvas.GetComponent<UpdatedAdminPanel>().hideUI();
     }
 
     public void cleanUpBeforeSwitch()
@@ -218,8 +232,9 @@ public class MasterScript : MonoBehaviour
         noteRud.SetActive(false);
         practiceCardsCanvas.SetActive(false);
         changePwCanvas.SetActive(false);
-        adminCanvas.SetActive(false);
+        adminCanvas.GetComponent<UpdatedAdminPanel>().hideUI();
         publicCardsetCanvas.SetActive(false);
+        updateUserScript.hideUI();
     }
 
 }
