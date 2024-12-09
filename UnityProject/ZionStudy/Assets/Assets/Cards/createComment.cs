@@ -16,6 +16,7 @@ public class createComment : MonoBehaviour
     public int setId;
     public TextMeshProUGUI messageBox;
     public GameObject publicUICanvas;
+    public string sentTitle;
 
     void Start()
     {
@@ -32,6 +33,8 @@ public class createComment : MonoBehaviour
             if(dbHelper.addComment(title.text, body.text, setId))
             {
                 gameObject.SetActive(false);
+                publicUICanvas.GetComponent<fillNewListview>().showData(setId, sentTitle);
+                //publicUICanvas.GetComponent<fillNewListview>().showUI();
             }
             else
             {
@@ -47,7 +50,7 @@ public class createComment : MonoBehaviour
     private void onCancelBtnPress()
     {
         gameObject.SetActive(false);
-        publicUICanvas.SetActive(true);
+        publicUICanvas.GetComponent<fillNewListview>().showUI();
         title.text = "";
         body.text = "";
         messageBox.text = "";

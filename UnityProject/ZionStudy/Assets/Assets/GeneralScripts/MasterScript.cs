@@ -46,13 +46,13 @@ public class MasterScript : MonoBehaviour
     public void startPublicCardsetCanvas()
     {
         cleanUpBeforeSwitch();
-        publicCardsetCanvas.SetActive(true);
+        publicCardsetCanvas.GetComponent<fillNewListview>().showUI();
     }
 
     public void closePublicCardsetCanvas()
     {
         cleanUpBeforeSwitch();
-        publicCardsetCanvas.SetActive(false);
+        publicCardsetCanvas.GetComponent<fillNewListview>().hideUI();
     }
 
     public void closeChangePwCanvas()
@@ -233,7 +233,7 @@ public class MasterScript : MonoBehaviour
         practiceCardsCanvas.SetActive(false);
         changePwCanvas.SetActive(false);
         adminCanvas.GetComponent<UpdatedAdminPanel>().hideUI();
-        publicCardsetCanvas.SetActive(false);
+        publicCardsetCanvas.GetComponent<fillNewListview>().hideUI();
         updateUserScript.hideUI();
     }
 

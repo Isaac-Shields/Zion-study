@@ -68,7 +68,6 @@ public class CreateNewCardScript : MonoBehaviour
                 addCard();
             }
 
-            Debug.Log("Cardset created");
         }
         else
         {
@@ -81,7 +80,6 @@ public class CreateNewCardScript : MonoBehaviour
     {
         if(dbHelper.addCardToCardset(question.text, answer.text, master.curCard.getSetId()))
         {
-            Debug.Log("Added problem");
             question.text = "";
             answer.text = "";
         }

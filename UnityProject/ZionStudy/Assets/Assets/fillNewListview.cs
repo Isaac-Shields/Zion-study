@@ -10,27 +10,22 @@ public class fillNewListview : MonoBehaviour
     public GameObject masterObj;
     private DatabaseHelper dbHelper;
     private MasterScript master;
-    public int setid = 0;
+    public int setid = -1;
     public PracticeCanvasMaster pcm;
     private string title;
     public GameObject createCommentCanvas;
     private Button addCommentBtn;
     private Button goBackBtn;
     private Button openCardsetBtn;
+    private UIDocument uiDoc;
 
     void Awake() 
     { 
+        uiDoc = gameObject.GetComponent<UIDocument>();
         master = masterObj.GetComponent<MasterScript>();
         dbHelper = masterObj.GetComponent<DatabaseHelper>();
-    }
 
-    public void showData(int sid, string t)
-    {
-        gameObject.SetActive(true);
-        setid = sid;
-        title = t;
         var root = GetComponent<UIDocument>().rootVisualElement;
-        Debug.Log(root);
         lv = root.Q<ListView>("commentLV");
 
         addCommentBtn = root.Q<Button>("addCommentBtn");
@@ -41,16 +36,21 @@ public class fillNewListview : MonoBehaviour
 
         openCardsetBtn = root.Q<Button>("continueBtn");
         openCardsetBtn.clicked += loadPCM;
+    }
 
+    public void showData(int sid, string t)
+    {
+        setid = sid;
+        title = t;
+        lv.itemsSource = null;
         List<commentObj> comments = dbHelper.getComments(sid);
         lv.itemsSource = comments;
         lv.makeItem = createLvItem;
         lv.bindItem = setValues;
         lv.fixedItemHeight = 50;
-        lv.Rebuild();
         master.closeCardsCanvas();
         master.closeNavBarCanvas();
-        gameObject.SetActive(true);
+        showUI();
 
     }
 
@@ -77,7 +77,8 @@ public class fillNewListview : MonoBehaviour
     {
         createCommentCanvas.SetActive(true);
         createCommentCanvas.GetComponent<createComment>().setId = setid;
-        gameObject.SetActive(false);
+        createCommentCanvas.GetComponent<createComment>().sentTitle = title;
+        hideUI();
     }
 
     private void onGoBackBtnPress()
@@ -86,4 +87,19 @@ public class fillNewListview : MonoBehaviour
         master.startCardsCanvas();
         master.startNavBarCanvas();
     }
+
+    public void showUI()
+    {
+        uiDoc = gameObject.GetComponent<UIDocument>();
+        var root = uiDoc.rootVisualElement;
+        root.style.display = DisplayStyle.Flex;
+    }
+
+    public void hideUI()
+    {
+        uiDoc = gameObject.GetComponent<UIDocument>();
+        var root = uiDoc.rootVisualElement;
+        root.style.display = DisplayStyle.None;
+    }
+
 }
